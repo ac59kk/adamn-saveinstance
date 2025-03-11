@@ -1,0 +1,109 @@
+local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+local table = table
+local string = string
+local math = math
+local tonumber = tonumber
+
+local function to_base64(data)
+    local result, bit_table = {}, {}
+    for i = 1, #data do
+        local byte = data:byte(i)
+        local bits = {}
+        for j = 7, 0, -1 do
+            bits[#bits + 1] = (math.floor(byte / (2 ^ j)) % 2 == 1) and '1' or '0'
+        end
+        bit_table[#bit_table + 1] = table.concat(bits)
+    end
+
+    local bit_string = table.concat(bit_table)
+    bit_string = bit_string .. string.rep('0', (6 - #bit_string % 6) % 6)
+
+    for i = 1, #bit_string, 6 do
+        local chunk = bit_string:sub(i, i + 5)
+        local index = tonumber(chunk, 2) + 1
+        result[#result + 1] = b:sub(index, index)
+    end
+
+    local padding = (#data % 3 == 1 and '==') or (#data % 3 == 2 and '=' or '')
+    return table.concat(result) .. padding
+end
+
+local realcheck = true
+if string.find(identifyexecutor(), "Solara") then realcheck = false end
+
+-- Overriding gethiddenproperty for later use
+getgenv().gethiddenpropertygethiddenproperty = gethiddenproperty
+
+-- Helper function to avoid using string.find directly
+local function string_find(s, pattern)
+    return string.find(s, pattern, nil, true)
+end
+
+-- Function to convert an array to a dictionary
+local function ArrayToDictionary(t, hybridMode, valueOverride, typeStrict)
+    local tmp = {}
+
+    if hybridMode then
+        for some1, some2 in pairs(t) do
+            if type(some1) == "number" then
+                tmp[some2] = valueOverride or true
+            elseif type(some2) == "table" then
+                tmp[some1] = ArrayToDictionary(some2, hybridMode) -- Some1 is Class, Some2 is Name
+            else
+                tmp[some1] = some2
+            end
+        end
+    else
+        for _, key in ipairs(t) do
+            if not typeStrict or typeStrict and type(key) == typeStrict then
+                tmp[key] = true
+            end
+        end
+    end
+
+    return tmp
+end
+
+local global_container
+
+-- Load Universal Method Finder
+do
+    local filename = "UniversalMethodFinder"
+    local finder
+
+    finder, global_container = loadstring(
+        game:HttpGet("https://raw.githubusercontent.com/luau/SomeHub/main/" .. filename .. ".luau", true),
+        filename
+    )()
+
+    finder({
+        -- Including string checks for possible methods
+        base64encode = 'local a={...}local b=a[1]local function c(a,b)return string.find(a,b,nil,true)end;return c(b,"encode")and(c(b,"base64")or c(string.lower(tostring(a[2])),"base64"))',
+        gethiddenproperty = 'string.find(...,"get",nil,true) and string.find(...,"h",nil,true) and string.find(...,"prop",nil,true) and string.sub(...,#...) ~= "s"',
+        -- Additional method checks can be included here
+    }, true, 10)
+end
+
+local identify_executor = identifyexecutor or getexecutorname or whatexecutor
+local EXECUTOR_NAME = identify_executor and identify_executor() or ""
+
+-- File operations
+local appendfile = appendfile
+local readfile = readfile
+local writefile = writefile
+
+-- Error handling for saving bytecode
+local function handleBytecode(...)
+    -- Your bytecode handling logic here
+end
+
+-- This would be where you include the rest of your function definitions 
+-- and structure.
+
+-- An example function usage
+local function saveInstance()
+    -- Your save instance logic here
+end
+
+-- Run the save operation
+saveInstance()
